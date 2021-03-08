@@ -1,0 +1,44 @@
+# Default values for dump2obj.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+# use --set name=backup-`date +%Y%m%d%H%M%S` to override in command line
+name: backup-20210307212155
+
+image:
+  repository: dump2obj
+  # pullPolicy: IfNotPresent
+  pullPolicy: Always
+  main: dump2obj:0.0.1
+  # Overrides the image tag whose default is the chart appVersion.
+  tag: ""
+
+# TODO
+serviceAccount:
+  # Specifies whether a service account should be created
+  create: false
+  # Annotations to add to the service account
+  annotations: {}
+  # The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name: ""
+
+annotations: {}
+
+storage:
+  className: local-storage
+  size: 1Gi
+
+mysql:
+  # this assume the job has access to (headless) service to mysql pod with port 3306
+  host: mysql.default.svc.cluster.local
+  port: "3306"
+
+mydumperArgs: ""
+
+minio:
+  alias: s3
+  url: https://s3.amazonaws.com
+  api: s3v4
+  path: dns
+  bucket: york-remote

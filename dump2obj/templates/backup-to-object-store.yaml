@@ -1,0 +1,67 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ .Values.name }}
+  labels:
+    app.kubernetes.io/name: {{ .Values.name }}
+spec:
+  template:
+    spec:
+      restartPolicy: "OnFailure"
+      {{- if .Values.serviceAccount }}
+      serviceAccount: {{ .Values.serviceAccount }}
+      {{- end }}
+      containers:
+      - name: dump2obj
+        image: {{ .Values.image.main }}
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        command: 
+        - /bin/sh
+        - -c
+        - |-
+{{ tuple "scripts/_start_backup.sh.tpl" . | include "helm-toolkit.utils.template" | indent 10}}
+        args: []
+        resources:
+          requests:
+            cpu: "2000m"
+            memory: "2048Mi"
+          limits:
+            cpu: "4000m"
+            memory: "8096Mi"
+        volumeMounts:
+        - name: dumps-persistent-storage
+          mountPath: /dumps
+        env:
+        - name: ACCESS_KEY
+          valueFrom:
+            secretKeyRef:
+              name: minio-secret
+              key: accessKey
+        - name: SECRET_KEY
+          valueFrom:
+            secretKeyRef:
+              name: minio-secret
+              key: secretKey
+        - name: DB_HOST
+          value: {{ .Values.mysql.host }}
+        - name: DB_PORT
+          value: {{ .Values.mysql.port }}
+        - name: DB_USER
+          valueFrom:
+            secretKeyRef:
+              name: mysql-secret
+              key: dbUser
+        - name: DB_PASS
+          valueFrom:
+            secretKeyRef:
+              name: mysql-secret
+              key: dbPass
+        - name: PV_MOUNT_PATH
+          value: /dumps
+        - name: BACKUP_NAME
+          value: {{ .Values.name }}
+
+      volumes:
+      - name: dumps-persistent-storage
+        persistentVolumeClaim:
+          claimName: {{ .Values.name }}-pvc
