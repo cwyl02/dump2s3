@@ -39,41 +39,9 @@ docker build . -t YOUR_REPO/dump2obj:0.0.1
     - not yet able to test it to see it in action. haven't make local storage based peresistent volumes work on my test k8s cluster..  :(
 
 
-
-<!-- ### Approach 2
-
-This is the high level idea when this program runs
-
-1. generate an output dir name 
-2. watch filesystem event dir.
-    - Upon new file, pipe file to object storage provider via minio client(mc)
-    - delete file 
-3. execute mydumper with args(including the output dir name)
-4.   -->
-
-<!-- ###
-mydumper will write files in parallel to folder X.
-
-Thus, we need our program to 
-
-1. watch this folder
-2. upon a new file pops up, stream the file to memory
-3. using mc pipe to S3 -->
-
-### TODOs:
-1. Use tools like helm to template the yaml manifests..
-2. see whether this actually works..
-3. more robust config file managements
-
-
 ### References
 
 https://github.com/pingcap/tidb-operator
 https://github.com/pingcap/tidb-cloud-backup
 https://github.com/pingcap/dumpling
 https://github.com/pingcap/br
-https://github.com/docker/for-win/issues/5325#issuecomment-567594291
-
-mkdir /mnt/wsl/hostmount
-<!-- echo hello > somedir hello                   -->
-sudo mount --bind /home/ubuntu/k8s-pvs /mnt/wsl/hostmount
